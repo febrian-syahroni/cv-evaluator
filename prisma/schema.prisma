@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model File {
+  id        String   @id @default(uuid())
+  filename  String
+  path      String
+  mimetype  String
+  size      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  cvJobs      Job[] @relation("CVFile")
+  projectJobs Job[] @relation("ProjectFile")
+
+  @@map("files")
+}
+
+model Job {
+  id        String   @id @default(uuid())
+  jobTitle  String
+  cvId      String
+  projectId String
+  status    JobStatus @default(QUEUED)
+  result    Json?
+  error     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  cvFile      File @relation("CVFile", fields: [cvId], references: [id])
+  projectFile File @relation("ProjectFile", fields: [projectId], references: [id])
+
+  @@map("jobs")
+}
+
+enum JobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
