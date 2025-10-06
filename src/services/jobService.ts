@@ -5,6 +5,7 @@ import { aiService } from './aiService';
 import { fileService } from './fileService';
 import { extractTextFromPDF } from '../utils/fileUtils';
 import { EvaluationRequest } from '../types';
+import { JobStatus } from '@prisma/client';
 
 // Create evaluation queue
 export const evaluationQueue = new Queue('evaluation', {
@@ -70,7 +71,7 @@ export class JobService {
     }
   }
 
-  async updateJobStatus(jobId: string, status: string, result?: any, error?: string) {
+  async updateJobStatus(jobId: string, status: JobStatus, result?: any, error?: string) {
     try {
       return await prisma.job.update({
         where: { id: jobId },
